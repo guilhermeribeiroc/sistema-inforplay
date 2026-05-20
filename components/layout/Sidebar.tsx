@@ -10,7 +10,6 @@ import {
   Kanban, Package, Users, Users2, TrendingUp, Settings, LogOut,
   ChevronLeft, ChevronRight, UserCircle, Wrench,
 } from 'lucide-react'
-import Image from 'next/image'
 
 interface NavItem {
   icon: React.ElementType
@@ -94,13 +93,11 @@ export default function Sidebar({ profile }: SidebarProps) {
         ) : (
           /* Expanded: logo completa */
           <div className="w-full">
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src="/logo.png"
               alt="Inforplay"
-              width={847}
-              height={373}
-              style={{ width: '100%', height: 'auto', borderRadius: 8 }}
-              priority
+              style={{ width: '100%', height: 'auto', borderRadius: 8, display: 'block' }}
             />
             <span className="flex items-center justify-center gap-1.5 mt-1.5 text-xs font-bold"
               style={{ color: '#38bdf8', fontSize: 9, letterSpacing: '0.1em' }}>

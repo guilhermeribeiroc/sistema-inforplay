@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react'
-import Image from 'next/image'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -89,13 +88,11 @@ export default function LoginPage() {
 
           {/* Logo */}
           <div className="flex flex-col items-center mb-7">
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src="/logo.png"
               alt="Inforplay"
-              width={847}
-              height={373}
-              style={{ width: '100%', maxWidth: 320, height: 'auto', borderRadius: 10 }}
-              priority
+              style={{ width: '100%', maxWidth: 340, height: 'auto', borderRadius: 12, display: 'block', margin: '0 auto' }}
             />
             <div className="h-px w-full mt-5" style={{ background: 'linear-gradient(90deg, transparent, rgba(14,165,233,0.4), transparent)' }} />
           </div>
