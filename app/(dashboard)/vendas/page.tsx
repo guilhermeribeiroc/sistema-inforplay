@@ -4,6 +4,7 @@ import { formatCurrency, formatDate, getPaymentLabel } from '@/lib/utils'
 import { ShoppingCart, Plus } from 'lucide-react'
 import Link from 'next/link'
 import type { Sale } from '@/lib/supabase/types'
+import { SaleActionsCell } from './SaleActionsCell'
 
 const statusStyle: Record<string, string> = {
   completed: 'badge-ready',
@@ -69,7 +70,7 @@ export default async function VendasPage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                {['#', 'Cliente', 'Funcionário', 'Pagamento', 'Total', 'Data', 'Status'].map(h => (
+                {['#', 'Cliente', 'Funcionário', 'Pagamento', 'Total', 'Data', 'Status', ''].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">{h}</th>
                 ))}
               </tr>
@@ -90,6 +91,9 @@ export default async function VendasPage() {
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusStyle[s.status] ?? ''}`}>
                       {statusLabel[s.status] ?? s.status}
                     </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <SaleActionsCell saleId={s.id} saleNumber={s.sale_number} />
                   </td>
                 </tr>
               ))}
