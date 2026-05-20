@@ -58,15 +58,15 @@ export default function CustomerSearch({ name, phone, onChangeName, onChangePhon
           <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           <input
             ref={inputRef}
-            className="input-field pl-8"
+            className={`input-field pl-8 ${isNew ? 'pr-16' : ''}`}
             placeholder="Nome do cliente..."
             value={name}
             onChange={e => { onChangeName(e.target.value); setOpen(true) }}
             onFocus={() => setOpen(true)}
           />
           {isNew && (
-            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-xs text-emerald-500 font-semibold">
-              <UserPlus size={11} /> novo
+            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-emerald-600 font-bold bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 pointer-events-none">
+              <UserPlus size={10} /> novo
             </span>
           )}
         </div>
