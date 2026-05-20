@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { formatCurrency } from '@/lib/utils'
-import { Package, Search, AlertTriangle, Plus, ArrowUpDown } from 'lucide-react'
+import { Package, Search, AlertTriangle, Plus, ArrowUpDown, Pencil } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function EstoquePage() {
@@ -60,28 +60,35 @@ export default async function EstoquePage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                {['Código', 'Material', 'Unidade', 'Custo', 'Preço de Venda', 'Estoque'].map(h => (
-                  <th key={h} className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
-                    {h}
-                  </th>
+                {['Código', 'Material', 'Setor', 'Unidade', 'Custo', 'Preço de Venda', 'Estoque', ''].map(h => (
+                  <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {(products ?? []).map((p) => (
-                <tr key={p.id} className="table-row-hover" style={{ borderBottom: '1px solid #f8fafc' }}>
-                  <td className="px-5 py-3 font-mono text-xs font-bold text-sky-600">{p.code}</td>
-                  <td className="px-5 py-3 font-medium text-gray-800 max-w-xs truncate">{p.name}</td>
-                  <td className="px-5 py-3 text-gray-500">{p.unit}</td>
-                  <td className="px-5 py-3 text-gray-600">{formatCurrency(p.cost)}</td>
-                  <td className="px-5 py-3 font-semibold text-gray-900">{formatCurrency(p.sale_price)}</td>
-                  <td className="px-5 py-3">
-                    <span
-                      className="font-bold text-sm"
-                      style={{ color: p.stock_quantity <= p.min_stock && p.min_stock > 0 ? '#f59e0b' : '#22c55e' }}
-                    >
-                      {p.stock_quantity}
+                <tr key={p.id} className="table-row-hover group" style={{ borderBottom: '1px solid #f8fafc' }}>
+                  <td className="px-4 py-2.5 font-mono text-xs font-bold text-sky-600">{p.code}</td>
+                  <td className="px-4 py-2.5 font-medium text-gray-800 max-w-xs">
+                    <span className="truncate block">{p.name}</span>
+                    {p.notes && <span className="text-xs text-gray-400 truncate block">{p.notes}</span>}
+                  </td>
+                  <td className="px-4 py-2.5 text-xs text-gray-500">{p.sector}</td>
+                  <td className="px-4 py-2.5 text-gray-500">{p.unit}</td>
+                  <td className="px-4 py-2.5 text-gray-600 text-sm">{formatCurrency(p.cost)}</td>
+                  <td className="px-4 py-2.5 font-semibold text-gray-900">{formatCurrency(p.sale_price)}</td>
+                  <td className="px-4 py-2.5">
+                    <span className="font-bold text-sm"
+                      style={{ color: p.stock_quantity <= p.min_stock && p.min_stock > 0 ? '#f59e0b' : '#22c55e' }}>
+                      {p.stock_quantity} {p.unit}
                     </span>
+                    {p.min_stock > 0 && <span className="text-xs text-gray-400 block">mín: {p.min_stock}</span>}
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <Link href={`/estoque/${p.id}/editar`}
+                      className="inline-flex items-center gap-1 text-xs font-medium text-sky-500 hover:text-sky-700 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded-lg hover:bg-sky-50">
+                      <Pencil size={12} /> Editar
+                    </Link>
                   </td>
                 </tr>
               ))}

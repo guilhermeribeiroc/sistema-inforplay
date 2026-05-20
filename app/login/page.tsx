@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Eye, EyeOff, Loader2, Lock, Mail, Zap } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react'
+import Image from 'next/image'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -88,21 +89,38 @@ export default function LoginPage() {
 
           {/* Logo */}
           <div className="flex flex-col items-center mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-xl"
-                style={{ background: 'linear-gradient(135deg, #0ea5e9, #6366f1)' }}
-              >
-                <Zap size={24} strokeWidth={2.5} />
+            <div className="flex flex-col items-center gap-3 mb-2">
+              {/* Logo + nome */}
+              <div className="flex items-center gap-3">
+                <div style={{
+                  background: 'linear-gradient(135deg,rgba(14,165,233,0.15),rgba(99,102,241,0.15))',
+                  border: '1px solid rgba(14,165,233,0.25)',
+                  borderRadius: 16,
+                  padding: 6,
+                }}>
+                  <Image src="/logo.svg" alt="Inforplay" width={52} height={52} style={{ borderRadius: 10 }} />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-black text-white tracking-tight leading-none">INFORPLAY</h1>
+                  <p className="text-xs font-medium mt-1" style={{ color: 'rgba(14,165,233,0.8)', letterSpacing: '0.12em' }}>
+                    PAPELARIA · INFORMÁTICA · GRÁFICA
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-black text-white tracking-tight">INFORPLAY</h1>
-                <p className="text-xs text-sky-400 font-medium tracking-widest uppercase">
-                  Sistema de Gestão
-                </p>
+              {/* Lojas */}
+              <div className="flex items-center gap-4 mt-1">
+                {[
+                  { city: 'Morada Nova', street: 'Cel. José Epifânio, 109' },
+                  { city: 'Limoeiro do Norte', street: 'Prof. Ricarte, 486' },
+                ].map((l, i) => (
+                  <div key={i} className="text-center">
+                    <p className="text-xs font-bold" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 9, letterSpacing: '0.06em' }}>{l.city.toUpperCase()}</p>
+                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 9 }}>{l.street}</p>
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="h-px w-full mt-6 mb-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(14,165,233,0.4), transparent)' }} />
+            <div className="h-px w-full mt-5 mb-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(14,165,233,0.4), transparent)' }} />
           </div>
 
           {/* Title */}

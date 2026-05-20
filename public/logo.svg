@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Outer glow ring -->
+  <rect width="120" height="120" rx="26" fill="#0f1729"/>
+  <rect x="1.5" y="1.5" width="117" height="117" rx="24.5" stroke="url(#ring)" stroke-width="3" fill="none" opacity="0.5"/>
+
+  <!-- Gradient definitions -->
+  <defs>
+    <linearGradient id="ring" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="letters" x1="20" y1="24" x2="100" y2="96" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Letter I -->
+  <!-- Top serif -->
+  <rect x="18" y="24" width="20" height="7" rx="3.5" fill="url(#letters)"/>
+  <!-- Stem -->
+  <rect x="24" y="31" width="8" height="42" rx="4" fill="url(#letters)"/>
+  <!-- Bottom serif -->
+  <rect x="18" y="73" width="20" height="7" rx="3.5" fill="url(#letters)"/>
+
+  <!-- Letter P -->
+  <!-- Stem -->
+  <rect x="50" y="24" width="8" height="56" rx="4" fill="url(#letters)"/>
+  <!-- Bowl outer -->
+  <path d="M58 24 H72 Q96 24 96 44 Q96 64 72 64 H58 V57 H72 Q87 57 87 44 Q87 31 72 31 H58 Z" fill="url(#letters)"/>
+</svg>

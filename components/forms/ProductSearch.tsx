@@ -77,7 +77,7 @@ export default function ProductSearch({ cart, onChange }: Props) {
         <input
           ref={inputRef}
           className="input-field pl-9 pr-9"
-          placeholder={allProducts.length === 0 ? 'Carregando produtos...' : `Buscar entre ${allProducts.length} produtos...`}
+          placeholder={allProducts.length === 0 ? 'Carregando...' : `Buscar produto (${allProducts.length} disponíveis)`}
           value={query}
           onChange={e => { setQuery(e.target.value); setOpen(true) }}
           onFocus={() => setOpen(true)}

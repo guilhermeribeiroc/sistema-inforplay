@@ -8,8 +8,9 @@ import { initials } from '@/lib/utils'
 import {
   LayoutDashboard, ShoppingCart, FileText, ClipboardList,
   Kanban, Package, Users, Users2, TrendingUp, Settings, LogOut,
-  ChevronLeft, ChevronRight, Zap, UserCircle, Wrench,
+  ChevronLeft, ChevronRight, UserCircle, Wrench,
 } from 'lucide-react'
+import Image from 'next/image'
 
 interface NavItem {
   icon: React.ElementType
@@ -81,21 +82,22 @@ export default function Sidebar({ profile }: SidebarProps) {
 
       {/* Logo */}
       <div
-        className="flex items-center gap-3 px-4 py-5"
+        className="flex items-center gap-3 px-4 py-4"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
       >
-        <div
-          className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-          style={{ background: 'linear-gradient(135deg, #0ea5e9, #6366f1)' }}
-        >
-          <Zap size={18} strokeWidth={2.5} className="text-white" />
+        <div className="shrink-0">
+          <Image src="/logo.svg" alt="Inforplay" width={36} height={36} style={{ borderRadius: 10 }} />
         </div>
         {!collapsed && (
           <div className="overflow-hidden">
-            <p className="text-white font-black text-base tracking-tight leading-none">INFORPLAY</p>
-            <p className="text-xs font-medium tracking-wider mt-0.5" style={{ color: 'rgba(14,165,233,0.8)' }}>
-              {isAdmin ? 'GERENTE' : 'FUNCIONÁRIO'}
+            <p className="text-white font-black text-sm tracking-tight leading-none">INFORPLAY</p>
+            <p className="text-xs font-medium mt-0.5 truncate" style={{ color: 'rgba(14,165,233,0.7)' }}>
+              Papelaria · Informática · Gráfica
             </p>
+            <span className="inline-block text-xs font-bold px-1.5 py-0 rounded mt-0.5"
+              style={{ background: 'rgba(14,165,233,0.15)', color: '#38bdf8', fontSize: 9, letterSpacing: '0.08em' }}>
+              {isAdmin ? '● GERENTE' : '● FUNCIONÁRIO'}
+            </span>
           </div>
         )}
       </div>
