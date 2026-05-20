@@ -82,21 +82,30 @@ export default function Sidebar({ profile }: SidebarProps) {
 
       {/* Logo */}
       <div
-        className="flex items-center gap-3 px-4 py-4"
+        className="flex flex-col items-center px-3 py-3 gap-1.5"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
       >
-        <div className="shrink-0">
-          <Image src="/logo.png" alt="Inforplay" width={38} height={38} style={{ borderRadius: 10, objectFit: 'cover' }} />
-        </div>
-        {!collapsed && (
-          <div className="overflow-hidden">
-            <p className="text-white font-black text-sm tracking-tight leading-none">INFORPLAY</p>
-            <p className="text-xs font-medium mt-0.5 truncate" style={{ color: 'rgba(14,165,233,0.7)' }}>
-              Papelaria · Informática · Gráfica
-            </p>
-            <span className="inline-block text-xs font-bold px-1.5 py-0 rounded mt-0.5"
-              style={{ background: 'rgba(14,165,233,0.15)', color: '#38bdf8', fontSize: 9, letterSpacing: '0.08em' }}>
-              {isAdmin ? '● GERENTE' : '● FUNCIONÁRIO'}
+        {collapsed ? (
+          /* Collapsed: só o ícone IP */
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-white text-sm shrink-0"
+            style={{ background: 'linear-gradient(135deg,#0ea5e9,#6366f1)' }}>
+            IP
+          </div>
+        ) : (
+          /* Expanded: logo completa */
+          <div className="w-full">
+            <Image
+              src="/logo.png"
+              alt="Inforplay"
+              width={847}
+              height={373}
+              style={{ width: '100%', height: 'auto', borderRadius: 8 }}
+              priority
+            />
+            <span className="flex items-center justify-center gap-1.5 mt-1.5 text-xs font-bold"
+              style={{ color: '#38bdf8', fontSize: 9, letterSpacing: '0.1em' }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 inline-block" />
+              {isAdmin ? 'GERENTE' : 'FUNCIONÁRIO'}
             </span>
           </div>
         )}

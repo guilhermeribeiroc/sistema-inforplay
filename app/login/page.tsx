@@ -88,39 +88,16 @@ export default function LoginPage() {
         <div className="glass rounded-3xl p-8" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
 
           {/* Logo */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="flex flex-col items-center gap-3 mb-2">
-              {/* Logo + nome */}
-              <div className="flex items-center gap-3">
-                <div style={{
-                  background: 'linear-gradient(135deg,rgba(14,165,233,0.15),rgba(99,102,241,0.15))',
-                  border: '1px solid rgba(14,165,233,0.25)',
-                  borderRadius: 16,
-                  padding: 6,
-                }}>
-                  <Image src="/logo.png" alt="Inforplay" width={60} height={60} style={{ borderRadius: 12, objectFit: 'cover' }} />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-black text-white tracking-tight leading-none">INFORPLAY</h1>
-                  <p className="text-xs font-medium mt-1" style={{ color: 'rgba(14,165,233,0.8)', letterSpacing: '0.12em' }}>
-                    PAPELARIA · INFORMÁTICA · GRÁFICA
-                  </p>
-                </div>
-              </div>
-              {/* Lojas */}
-              <div className="flex items-center gap-4 mt-1">
-                {[
-                  { city: 'Morada Nova', street: 'Cel. José Epifânio, 109' },
-                  { city: 'Limoeiro do Norte', street: 'Prof. Ricarte, 486' },
-                ].map((l, i) => (
-                  <div key={i} className="text-center">
-                    <p className="text-xs font-bold" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 9, letterSpacing: '0.06em' }}>{l.city.toUpperCase()}</p>
-                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 9 }}>{l.street}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="h-px w-full mt-5 mb-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(14,165,233,0.4), transparent)' }} />
+          <div className="flex flex-col items-center mb-7">
+            <Image
+              src="/logo.png"
+              alt="Inforplay"
+              width={847}
+              height={373}
+              style={{ width: '100%', maxWidth: 320, height: 'auto', borderRadius: 10 }}
+              priority
+            />
+            <div className="h-px w-full mt-5" style={{ background: 'linear-gradient(90deg, transparent, rgba(14,165,233,0.4), transparent)' }} />
           </div>
 
           {/* Title */}

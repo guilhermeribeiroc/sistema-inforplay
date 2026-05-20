@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { formatCurrency } from '@/lib/utils'
-import { Users, Crown, TrendingUp, UserPlus } from 'lucide-react'
+import { Users, Crown, TrendingUp, UserPlus, Pencil } from 'lucide-react'
 import Link from 'next/link'
 import type { Profile, SellerRanking } from '@/lib/supabase/types'
 
@@ -71,6 +71,10 @@ export default async function FuncionariosPage() {
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${emp.active ? 'badge-ready' : 'badge-cancelled'}`}>
                   {emp.active ? 'Ativo' : 'Inativo'}
                 </span>
+                <Link href={`/funcionarios/${emp.id}/editar`}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-sky-500 hover:text-sky-700 px-2 py-1 rounded-lg hover:bg-sky-50 transition-colors">
+                  <Pencil size={12} /> Editar
+                </Link>
               </div>
             </div>
           )
