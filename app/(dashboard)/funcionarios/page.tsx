@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { formatCurrency } from '@/lib/utils'
-import { Users, Crown, TrendingUp } from 'lucide-react'
+import { Users, Crown, TrendingUp, UserPlus } from 'lucide-react'
+import Link from 'next/link'
 import type { Profile, SellerRanking } from '@/lib/supabase/types'
 
 export default async function FuncionariosPage() {
@@ -19,11 +20,16 @@ export default async function FuncionariosPage() {
 
   return (
     <div className="p-6 lg:p-8 space-y-5">
-      <div>
-        <h1 className="text-2xl font-black text-gray-900 flex items-center gap-2">
-          <Users size={22} className="text-sky-500" /> Funcionários
-        </h1>
-        <p className="text-sm text-gray-400 mt-0.5">{employees.filter(e => e.active).length} ativos · {employees.length} total</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-black text-gray-900 flex items-center gap-2">
+            <Users size={22} className="text-sky-500" /> Funcionários
+          </h1>
+          <p className="text-sm text-gray-400 mt-0.5">{employees.filter(e => e.active).length} ativos · {employees.length} total</p>
+        </div>
+        <Link href="/funcionarios/novo" className="btn-primary">
+          <UserPlus size={15} /> Novo Funcionário
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { formatCurrency } from '@/lib/utils'
-import { Package, Search, AlertTriangle } from 'lucide-react'
+import { Package, Search, AlertTriangle, Plus, ArrowUpDown } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function EstoquePage() {
   const supabase = await createClient()
@@ -27,6 +28,14 @@ export default async function EstoquePage() {
             Estoque
           </h1>
           <p className="text-sm text-gray-400 mt-0.5">{products?.length ?? 0} materiais cadastrados</p>
+        </div>
+        <div className="flex gap-2">
+          <Link href="/estoque/ajuste" className="btn-ghost flex items-center gap-1.5 text-sm">
+            <ArrowUpDown size={14} /> Ajustar
+          </Link>
+          <Link href="/estoque/novo" className="btn-primary">
+            <Plus size={15} /> Novo Produto
+          </Link>
         </div>
       </div>
 

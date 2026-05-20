@@ -21,7 +21,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { icon: LayoutDashboard, label: 'Dashboard',      href: '/',                adminOnly: true },
-  { icon: ShoppingCart,    label: 'Nova Venda',      href: '/vendas/nova' },
+  { icon: ShoppingCart,    label: 'Vendas',           href: '/vendas' },
   { icon: FileText,        label: 'Orçamentos',      href: '/orcamentos' },
   { icon: ClipboardList,   label: 'Ordens de Serviço',href: '/ordens-servico' },
   { icon: Kanban,          label: 'Status',           href: '/status' },
