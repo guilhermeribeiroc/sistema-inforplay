@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { formatCurrency } from '@/lib/utils'
-import { Wrench, Star, Crown } from 'lucide-react'
+import { Wrench, Star, Crown, Plus } from 'lucide-react'
+import Link from 'next/link'
 import type { ThirdParty } from '@/lib/supabase/types'
 
 export default async function TerceirizadosPage() {
@@ -17,11 +18,16 @@ export default async function TerceirizadosPage() {
 
   return (
     <div className="p-6 lg:p-8 space-y-5">
-      <div>
-        <h1 className="text-2xl font-black text-gray-900 flex items-center gap-2">
-          <Wrench size={22} className="text-sky-500" /> Terceirizados
-        </h1>
-        <p className="text-sm text-gray-400 mt-0.5">{list.filter(t => t.active).length} ativos</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-black text-gray-900 flex items-center gap-2">
+            <Wrench size={22} className="text-sky-500" /> Terceirizados
+          </h1>
+          <p className="text-sm text-gray-400 mt-0.5">{list.filter(t => t.active).length} ativos · {list.length} total</p>
+        </div>
+        <Link href="/terceirizados/novo" className="btn-primary">
+          <Plus size={15} /> Novo Terceirizado
+        </Link>
       </div>
 
       {top && (
