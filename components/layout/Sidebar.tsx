@@ -7,7 +7,7 @@ import type { Profile } from '@/lib/supabase/types'
 import { initials } from '@/lib/utils'
 import {
   LayoutDashboard, ShoppingCart, FileText, ClipboardList,
-  Kanban, Package, Users, TrendingUp, Settings, LogOut,
+  Kanban, Package, Users, Users2, TrendingUp, Settings, LogOut,
   ChevronLeft, ChevronRight, Zap, UserCircle, Wrench,
 } from 'lucide-react'
 
@@ -21,12 +21,13 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { icon: LayoutDashboard, label: 'Dashboard',      href: '/',                adminOnly: true },
-  { icon: ShoppingCart,    label: 'Vendas',           href: '/vendas' },
-  { icon: FileText,        label: 'Orçamentos',      href: '/orcamentos' },
-  { icon: ClipboardList,   label: 'Ordens de Serviço',href: '/ordens-servico' },
-  { icon: Kanban,          label: 'Status',           href: '/status' },
-  { icon: Package,         label: 'Estoque',          href: '/estoque',         adminOnly: true },
-  { icon: Users,           label: 'Funcionários',     href: '/funcionarios',    adminOnly: true },
+  { icon: ShoppingCart,    label: 'Vendas',            href: '/vendas' },
+  { icon: FileText,        label: 'Orçamentos',       href: '/orcamentos' },
+  { icon: ClipboardList,   label: 'Ordens de Serviço', href: '/ordens-servico' },
+  { icon: Kanban,          label: 'Status',            href: '/status' },
+  { icon: Users2,          label: 'Clientes',          href: '/clientes' },
+  { icon: Package,         label: 'Estoque',           href: '/estoque',         adminOnly: true },
+  { icon: Users,           label: 'Funcionários',      href: '/funcionarios',    adminOnly: true },
   { icon: Wrench,          label: 'Terceirizados',    href: '/terceirizados',   adminOnly: true },
   { icon: TrendingUp,      label: 'Relatórios',       href: '/relatorios',      adminOnly: true },
   { icon: Settings,        label: 'Configurações',    href: '/configuracoes' },

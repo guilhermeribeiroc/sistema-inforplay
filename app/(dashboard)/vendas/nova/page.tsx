@@ -1,80 +1,31 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { ChevronLeft, ShoppingCart, Loader2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
-import { Search, Plus, Trash2, ShoppingCart, ChevronLeft, Loader2, Check } from 'lucide-react'
 import toast from 'react-hot-toast'
-import type { Product } from '@/lib/supabase/types'
-
-interface CartItem {
-  product: Product
-  quantity: number
-  unit_price: number
-}
+import ProductSearch, { type CartItem } from '@/components/forms/ProductSearch'
+import CustomerSearch from '@/components/forms/CustomerSearch'
 
 const paymentMethods = [
-  { value: 'pix',         label: 'PIX' },
-  { value: 'cash',        label: 'Dinheiro' },
-  { value: 'credit_card', label: 'Cartão Crédito' },
-  { value: 'debit_card',  label: 'Cartão Débito' },
-  { value: 'transfer',    label: 'Transferência' },
+  { value: 'pix',         label: 'PIX',       color: '#22c55e' },
+  { value: 'cash',        label: 'Dinheiro',  color: '#0ea5e9' },
+  { value: 'credit_card', label: 'Crédito',   color: '#6366f1' },
+  { value: 'debit_card',  label: 'Débito',    color: '#f59e0b' },
+  { value: 'transfer',    label: 'Transfer.', color: '#64748b' },
 ]
 
 export default function NovaVendaPage() {
   const router = useRouter()
-  const supabase = createClient()
-  const searchRef = useRef<HTMLInputElement>(null)
-
   const [customerName, setCustomerName] = useState('')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<Product[]>([])
+  const [customerPhone, setCustomerPhone] = useState('')
+  const [payment, setPayment] = useState('pix')
+  const [notes, setNotes] = useState('')
   const [cart, setCart] = useState<CartItem[]>([])
   const [discount, setDiscount] = useState(0)
-  const [paymentMethod, setPaymentMethod] = useState('pix')
-  const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
-  const [showSearch, setShowSearch] = useState(false)
-
-  // Busca de produtos com debounce
-  useEffect(() => {
-    if (searchQuery.length < 2) { setSearchResults([]); return }
-    const t = setTimeout(async () => {
-      const { data } = await supabase
-        .from('products')
-        .select('*')
-        .eq('active', true)
-        .or(`name.ilike.%${searchQuery}%,code.ilike.%${searchQuery}%`)
-        .limit(8)
-      setSearchResults((data as Product[]) ?? [])
-    }, 250)
-    return () => clearTimeout(t)
-  }, [searchQuery])
-
-  function addToCart(product: Product) {
-    setCart(prev => {
-      const exists = prev.find(i => i.product.id === product.id)
-      if (exists) return prev.map(i => i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i)
-      return [...prev, { product, quantity: 1, unit_price: product.sale_price }]
-    })
-    setSearchQuery('')
-    setSearchResults([])
-    searchRef.current?.focus()
-  }
-
-  function removeFromCart(id: string) {
-    setCart(prev => prev.filter(i => i.product.id !== id))
-  }
-
-  function updateQty(id: string, qty: number) {
-    if (qty <= 0) { removeFromCart(id); return }
-    setCart(prev => prev.map(i => i.product.id === id ? { ...i, quantity: qty } : i))
-  }
-
-  function updatePrice(id: string, price: number) {
-    setCart(prev => prev.map(i => i.product.id === id ? { ...i, unit_price: price } : i))
-  }
 
   const subtotal = cart.reduce((s, i) => s + i.quantity * i.unit_price, 0)
   const total = Math.max(0, subtotal - discount)
@@ -83,22 +34,31 @@ export default function NovaVendaPage() {
     if (cart.length === 0) { toast.error('Adicione pelo menos um produto.'); return }
     setLoading(true)
     try {
+      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       const { data: profile } = await supabase.from('profiles').select('id,name').eq('id', user!.id).single() as any
 
-      const { data: sale, error } = await supabase.from('sales').insert({
-        customer_name: customerName || 'Cliente Avulso',
-        employee_id: user!.id,
-        employee_name: profile?.name ?? '',
-        status: 'completed',
-        subtotal,
-        discount,
-        total,
-        payment_method: paymentMethod,
-        notes,
-        sale_date: new Date().toISOString().split('T')[0],
-      }).select().single() as any
+      if (customerName.trim()) {
+        const { data: existing } = await supabase.from('customers')
+          .select('id').ilike('name', customerName.trim()).limit(1)
+        if (!existing || existing.length === 0) {
+          await supabase.from('customers').insert({ name: customerName.trim(), phone: customerPhone || null })
+        }
+      }
 
+      const { data: sale, error } = await supabase.from('sales').insert({
+        customer_name: customerName.trim() || 'Cliente Avulso',
+        customer_phone: customerPhone || null,
+        employee_id: user!.id,
+        employee_name: profile?.name,
+        status: 'completed',
+        subtotal, discount,
+        discount_percent: subtotal > 0 ? (discount / subtotal) * 100 : 0,
+        total,
+        payment_method: payment,
+        notes: notes || null,
+        sale_date: new Date().toISOString().slice(0, 10),
+      }).select().single() as any
       if (error) throw error
 
       await supabase.from('sale_items').insert(
@@ -116,203 +76,68 @@ export default function NovaVendaPage() {
       )
 
       toast.success(`Venda #${sale.sale_number} registrada!`)
-      router.push('/')
+      router.push('/vendas')
     } catch (e: any) {
-      toast.error('Erro ao registrar venda: ' + e.message)
-    } finally {
-      setLoading(false)
-    }
+      toast.error('Erro: ' + e.message)
+    } finally { setLoading(false) }
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-5xl space-y-5">
-      {/* Header */}
+    <div className="p-6 lg:p-8 max-w-4xl space-y-5">
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="btn-ghost p-2">
-          <ChevronLeft size={18} />
-        </button>
-        <div>
-          <h1 className="text-2xl font-black text-gray-900 flex items-center gap-2">
-            <ShoppingCart size={22} className="text-sky-500" /> Nova Venda
-          </h1>
-          <p className="text-sm text-gray-400 mt-0.5">Registre uma venda rapidamente</p>
-        </div>
+        <button onClick={() => router.back()} className="btn-ghost p-2"><ChevronLeft size={18} /></button>
+        <h1 className="text-2xl font-black text-gray-900 flex items-center gap-2">
+          <ShoppingCart size={22} className="text-sky-500" /> Nova Venda
+        </h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* LEFT: produtos */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Cliente */}
-          <div className="card p-4">
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Cliente</label>
-            <input
-              className="input-field"
-              placeholder="Nome do cliente (opcional)"
-              value={customerName}
-              onChange={e => setCustomerName(e.target.value)}
+          <div className="card p-5 space-y-3">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Cliente</h3>
+            <CustomerSearch
+              name={customerName} phone={customerPhone}
+              onChangeName={setCustomerName} onChangePhone={setCustomerPhone}
             />
-          </div>
-
-          {/* Busca de produto */}
-          <div className="card p-4">
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Adicionar Produto</label>
-            <div className="relative">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                ref={searchRef}
-                className="input-field pl-9"
-                placeholder="Buscar por nome ou código..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-              {/* Dropdown resultados */}
-              {searchResults.length > 0 && (
-                <div className="absolute z-30 w-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
-                  {searchResults.map(p => (
-                    <button
-                      key={p.id}
-                      onClick={() => addToCart(p)}
-                      className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-sky-50 transition-colors text-left"
-                    >
-                      <div>
-                        <span className="font-mono text-xs text-sky-600 mr-2">{p.code}</span>
-                        <span className="text-sm font-medium text-gray-800">{p.name}</span>
-                      </div>
-                      <div className="text-right shrink-0 ml-3">
-                        <p className="text-sm font-bold text-gray-900">{formatCurrency(p.sale_price)}</p>
-                        <p className="text-xs text-gray-400">/{p.unit}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Observações</label>
+              <input className="input-field text-sm" placeholder="Observações..." value={notes} onChange={e => setNotes(e.target.value)} />
             </div>
           </div>
 
-          {/* Carrinho */}
-          <div className="card overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-50 flex items-center justify-between">
-              <span className="text-sm font-bold text-gray-700">Itens ({cart.length})</span>
-            </div>
-            {cart.length === 0 ? (
-              <div className="text-center py-10 text-gray-300">
-                <ShoppingCart size={36} className="mx-auto mb-2" />
-                <p className="text-sm">Nenhum item adicionado</p>
-              </div>
-            ) : (
-              <div className="divide-y divide-gray-50">
-                {cart.map(item => (
-                  <div key={item.product.id} className="px-4 py-3 flex items-center gap-3">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-800 truncate">{item.product.name}</p>
-                      <p className="text-xs text-gray-400">{item.product.code}</p>
-                    </div>
-                    {/* Qty */}
-                    <div className="flex items-center gap-1.5">
-                      <button onClick={() => updateQty(item.product.id, item.quantity - 1)}
-                        className="w-6 h-6 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 text-base font-bold">−</button>
-                      <input
-                        type="number"
-                        value={item.quantity}
-                        onChange={e => updateQty(item.product.id, Number(e.target.value))}
-                        className="w-14 text-center input-field py-1 text-sm"
-                      />
-                      <button onClick={() => updateQty(item.product.id, item.quantity + 1)}
-                        className="w-6 h-6 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 text-base font-bold">+</button>
-                    </div>
-                    {/* Preço unitário */}
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs text-gray-400">R$</span>
-                      <input
-                        type="number"
-                        value={item.unit_price}
-                        onChange={e => updatePrice(item.product.id, Number(e.target.value))}
-                        className="w-20 input-field py-1 text-sm text-right"
-                        step="0.01"
-                      />
-                    </div>
-                    {/* Total linha */}
-                    <p className="w-20 text-sm font-bold text-gray-900 text-right">
-                      {formatCurrency(item.quantity * item.unit_price)}
-                    </p>
-                    <button onClick={() => removeFromCart(item.product.id)}
-                      className="text-red-400 hover:text-red-600 transition-colors p-1">
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="card p-5">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Produtos / Serviços</h3>
+            <ProductSearch cart={cart} onChange={setCart} />
           </div>
         </div>
 
-        {/* RIGHT: resumo */}
         <div className="space-y-4">
-          <div className="card p-4 space-y-3">
-            <h3 className="font-bold text-gray-900 text-sm uppercase tracking-wider">Resumo</h3>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Subtotal</span>
-              <span className="font-semibold">{formatCurrency(subtotal)}</span>
-            </div>
-            {/* Desconto */}
-            <div>
-              <label className="text-xs text-gray-500 mb-1 block">Desconto (R$)</label>
-              <input
-                type="number"
-                value={discount}
-                onChange={e => setDiscount(Number(e.target.value))}
-                className="input-field text-sm"
-                min={0}
-                step="0.50"
-              />
-            </div>
-            <div className="flex justify-between text-base font-black pt-2 border-t border-gray-100">
-              <span>Total</span>
-              <span className="text-sky-600">{formatCurrency(total)}</span>
-            </div>
-          </div>
-
-          {/* Pagamento */}
           <div className="card p-4">
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Forma de Pagamento</label>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Pagamento</label>
             <div className="grid grid-cols-1 gap-1.5">
-              {paymentMethods.map(pm => (
-                <button
-                  key={pm.value}
-                  onClick={() => setPaymentMethod(pm.value)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all"
-                  style={{
-                    background: paymentMethod === pm.value ? 'rgba(14,165,233,0.1)' : '#f8fafc',
-                    color: paymentMethod === pm.value ? '#0ea5e9' : '#64748b',
-                    border: paymentMethod === pm.value ? '1.5px solid rgba(14,165,233,0.3)' : '1.5px solid transparent',
-                  }}
-                >
-                  {paymentMethod === pm.value && <Check size={13} />}
-                  {pm.label}
+              {paymentMethods.map(p => (
+                <button key={p.value} onClick={() => setPayment(p.value)}
+                  className="py-2 px-3 rounded-xl text-sm font-bold transition-all text-left"
+                  style={{ background: payment === p.value ? p.color : '#f1f5f9', color: payment === p.value ? '#fff' : '#64748b' }}>
+                  {p.label}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Observações */}
-          <div className="card p-4">
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Observações</label>
-            <textarea
-              className="input-field text-sm resize-none"
-              rows={2}
-              placeholder="Obs. opcionais..."
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-            />
+          <div className="card p-4 space-y-2">
+            <div className="flex justify-between text-sm"><span className="text-gray-500">Subtotal</span><span>{formatCurrency(subtotal)}</span></div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Desconto (R$)</label>
+              <input type="number" className="input-field text-sm" value={discount} onChange={e => setDiscount(Number(e.target.value))} min={0} />
+            </div>
+            <div className="flex justify-between font-black text-lg pt-2 border-t border-gray-100">
+              <span>Total</span><span className="text-sky-600">{formatCurrency(total)}</span>
+            </div>
           </div>
 
-          <button
-            onClick={handleSubmit}
-            disabled={loading || cart.length === 0}
-            className="btn-primary w-full py-3 text-base"
-            style={{ opacity: cart.length === 0 ? 0.5 : 1 }}
-          >
-            {loading ? <><Loader2 size={16} className="animate-spin" /> Salvando...</> : <>Finalizar Venda · {formatCurrency(total)}</>}
+          <button onClick={handleSubmit} disabled={loading || cart.length === 0} className="btn-primary w-full py-3 disabled:opacity-50">
+            {loading ? <><Loader2 size={15} className="animate-spin" /> Registrando...</> : `Finalizar Venda · ${formatCurrency(total)}`}
           </button>
         </div>
       </div>
