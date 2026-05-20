@@ -98,7 +98,7 @@ export default function LoginPage() {
                   borderRadius: 16,
                   padding: 6,
                 }}>
-                  <Image src="/logo.svg" alt="Inforplay" width={52} height={52} style={{ borderRadius: 10 }} />
+                  <Image src="/logo.png" alt="Inforplay" width={60} height={60} style={{ borderRadius: 12, objectFit: 'cover' }} />
                 </div>
                 <div>
                   <h1 className="text-3xl font-black text-white tracking-tight leading-none">INFORPLAY</h1>

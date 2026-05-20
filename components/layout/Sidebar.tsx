@@ -86,7 +86,7 @@ export default function Sidebar({ profile }: SidebarProps) {
         style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
       >
         <div className="shrink-0">
-          <Image src="/logo.svg" alt="Inforplay" width={36} height={36} style={{ borderRadius: 10 }} />
+          <Image src="/logo.png" alt="Inforplay" width={38} height={38} style={{ borderRadius: 10, objectFit: 'cover' }} />
         </div>
         {!collapsed && (
           <div className="overflow-hidden">

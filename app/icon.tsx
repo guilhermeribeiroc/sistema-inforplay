@@ -1,31 +1,18 @@
 import { ImageResponse } from 'next/og'
+import { readFile } from 'fs/promises'
+import { join } from 'path'
 
 export const size = { width: 32, height: 32 }
 export const contentType = 'image/png'
 
-export default function Icon() {
+export default async function Icon() {
+  const logoData = await readFile(join(process.cwd(), 'public', 'logo.png'))
+  const logoBase64 = `data:image/png;base64,${logoData.toString('base64')}`
+
   return new ImageResponse(
     (
-      <div
-        style={{
-          width: 32, height: 32,
-          borderRadius: 8,
-          background: '#0f1729',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          border: '1.5px solid rgba(14,165,233,0.4)',
-        }}
-      >
-        <span style={{
-          fontFamily: 'sans-serif',
-          fontWeight: 900,
-          fontSize: 14,
-          color: 'white',
-          letterSpacing: '-1px',
-        }}>
-          IP
-        </span>
+      <div style={{ width: 32, height: 32, borderRadius: 8, overflow: 'hidden', display: 'flex' }}>
+        <img src={logoBase64} width={32} height={32} style={{ objectFit: 'cover' }} />
       </div>
     ),
     { ...size }
