@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Search, Trash2, ChevronDown } from 'lucide-react'
+import { Search, Trash2, ChevronDown, Package } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import type { Product } from '@/lib/supabase/types'
 
@@ -70,64 +70,59 @@ export default function ProductSearch({ cart, onChange }: Props) {
   }, [])
 
   return (
-    <div>
-      {/* Search input */}
-      <div className="relative mb-3">
+    <div className="space-y-3">
+      {/* Campo de busca */}
+      <div className="relative">
         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
         <input
           ref={inputRef}
           className="input-field pl-9 pr-9"
-          placeholder={allProducts.length === 0 ? 'Carregando...' : `Buscar produto (${allProducts.length} disponíveis)`}
+          placeholder={allProducts.length === 0 ? 'Carregando produtos...' : `Buscar em ${allProducts.length} produtos...`}
           value={query}
           onChange={e => { setQuery(e.target.value); setOpen(true) }}
           onFocus={() => setOpen(true)}
         />
         <ChevronDown
-          size={15}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-transform"
-          style={{ transform: open ? 'translateY(-50%) rotate(180deg)' : 'translateY(-50%)' }}
+          size={14}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+          style={{
+            transform: open ? 'translateY(-50%) rotate(180deg)' : 'translateY(-50%)',
+            transition: 'transform 0.15s',
+          }}
         />
 
         {open && (
           <div
             ref={dropdownRef}
             className="absolute z-50 left-0 right-0 mt-1 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col"
-            style={{ maxHeight: '320px' }}
+            style={{ maxHeight: 320 }}
           >
-            {/* Header */}
-            <div className="px-3 pt-2.5 pb-1.5 border-b border-gray-50 shrink-0 flex items-center justify-between">
+            <div className="px-3 py-2 border-b border-gray-50 shrink-0 flex items-center justify-between">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 {query ? `${filtered.length} resultado(s)` : `Todos os produtos (${allProducts.length})`}
               </p>
-              {query && filtered.length === 0 && (
-                <span className="text-xs text-red-400">Nenhum encontrado</span>
-              )}
             </div>
-
-            {/* List */}
             <div className="overflow-y-auto flex-1">
               {filtered.map((p, idx) => (
                 <button
                   key={p.id}
                   onMouseDown={() => addToCart(p)}
-                  className="w-full flex items-center justify-between px-3 py-2 hover:bg-sky-50 text-left transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-sky-50 text-left transition-colors"
                   style={{ borderTop: idx > 0 ? '1px solid #f8fafc' : 'none' }}
                 >
-                  <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
-                    <span className="font-mono text-xs font-bold text-sky-600 shrink-0 w-14 truncate">{p.code}</span>
-                    <span className="text-sm text-gray-800 truncate">{p.name}</span>
-                    <span className="text-xs text-gray-400 shrink-0">{p.unit}</span>
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1 mr-3">
+                    <span className="font-mono text-xs font-bold text-sky-600 shrink-0 w-16 truncate">{p.code}</span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-800 truncate">{p.name}</p>
+                      <p className="text-xs text-gray-400">{p.unit} · estoque: {p.stock_quantity}</p>
+                    </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-sm font-bold text-gray-900">{formatCurrency(p.sale_price)}</p>
-                    <p className="text-xs text-gray-400">est: {p.stock_quantity}</p>
-                  </div>
+                  <p className="text-sm font-bold text-gray-900 shrink-0">{formatCurrency(p.sale_price)}</p>
                 </button>
               ))}
-
               {filtered.length === 0 && query && (
-                <div className="p-4 text-sm text-gray-400 text-center">
-                  Nenhum produto encontrado para "<strong>{query}</strong>"
+                <div className="p-5 text-sm text-gray-400 text-center">
+                  Nenhum produto para "<strong>{query}</strong>"
                 </div>
               )}
             </div>
@@ -135,61 +130,65 @@ export default function ProductSearch({ cart, onChange }: Props) {
         )}
       </div>
 
-      {/* Cart items */}
-      {cart.length > 0 && (
-        <div className="border border-gray-100 rounded-xl overflow-hidden">
-          <div className="grid grid-cols-12 gap-1 px-3 py-1.5 bg-gray-50 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-            <div className="col-span-5">Produto</div>
-            <div className="col-span-2 text-center">Qtd</div>
-            <div className="col-span-2 text-center">Unit. (R$)</div>
-            <div className="col-span-2 text-right">Total</div>
-            <div className="col-span-1"></div>
+      {/* Tabela do carrinho */}
+      {cart.length > 0 ? (
+        <div className="rounded-xl border border-gray-100 overflow-hidden">
+          {/* Header */}
+          <div className="grid px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-400 uppercase tracking-wider"
+            style={{ gridTemplateColumns: '1fr 80px 90px 80px 32px' }}>
+            <span>Produto</span>
+            <span className="text-center">Qtd</span>
+            <span className="text-center">Unit. R$</span>
+            <span className="text-right">Total</span>
+            <span />
           </div>
+
           {cart.map(item => (
-            <div key={item.product.id} className="grid grid-cols-12 gap-1 px-3 py-2 items-center border-t border-gray-50">
-              <div className="col-span-5 min-w-0">
+            <div
+              key={item.product.id}
+              className="grid px-4 py-2.5 items-center border-t border-gray-50 hover:bg-gray-50/50 transition-colors"
+              style={{ gridTemplateColumns: '1fr 80px 90px 80px 32px' }}
+            >
+              <div className="min-w-0 pr-2">
                 <p className="text-sm font-medium text-gray-800 truncate">{item.product.name}</p>
                 <p className="text-xs text-gray-400">{item.product.code} · {item.product.unit}</p>
               </div>
-              <div className="col-span-2">
-                <input
-                  type="number"
-                  value={item.quantity}
-                  onChange={e => updateQty(item.product.id, Number(e.target.value))}
-                  className="w-full text-center rounded-lg border border-gray-200 px-1 py-1 text-sm focus:outline-none focus:border-sky-400"
-                  min={1}
-                />
-              </div>
-              <div className="col-span-2">
-                <input
-                  type="number"
-                  value={item.unit_price}
-                  onChange={e => updatePrice(item.product.id, Number(e.target.value))}
-                  className="w-full text-center rounded-lg border border-gray-200 px-1 py-1 text-sm focus:outline-none focus:border-sky-400"
-                  min={0}
-                  step={0.01}
-                />
-              </div>
-              <div className="col-span-2 text-right">
-                <span className="text-sm font-bold text-gray-900">{formatCurrency(item.quantity * item.unit_price)}</span>
-              </div>
-              <div className="col-span-1 flex justify-center">
-                <button
-                  onClick={() => onChange(cart.filter(i => i.product.id !== item.product.id))}
-                  className="text-red-400 hover:text-red-600 p-1 rounded"
-                >
-                  <Trash2 size={13} />
-                </button>
-              </div>
+
+              <input
+                type="number"
+                value={item.quantity}
+                onChange={e => updateQty(item.product.id, Number(e.target.value))}
+                className="w-full text-center rounded-lg border border-gray-200 px-1 py-1.5 text-sm focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100"
+                min={1}
+              />
+
+              <input
+                type="number"
+                value={item.unit_price}
+                onChange={e => updatePrice(item.product.id, Number(e.target.value))}
+                className="w-full text-center rounded-lg border border-gray-200 px-1 py-1.5 text-sm focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100"
+                min={0}
+                step={0.01}
+              />
+
+              <p className="text-sm font-bold text-gray-900 text-right">
+                {formatCurrency(item.quantity * item.unit_price)}
+              </p>
+
+              <button
+                onClick={() => onChange(cart.filter(i => i.product.id !== item.product.id))}
+                className="flex items-center justify-center text-gray-300 hover:text-red-500 transition-colors rounded-lg p-1 hover:bg-red-50 ml-auto"
+              >
+                <Trash2 size={14} />
+              </button>
             </div>
           ))}
         </div>
-      )}
-
-      {cart.length === 0 && (
-        <p className="text-center text-gray-300 text-sm py-3">
-          Clique no campo acima e selecione os produtos
-        </p>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-8 rounded-xl border border-dashed border-gray-200 text-gray-300">
+          <Package size={28} className="mb-2 opacity-50" />
+          <p className="text-sm">Clique no campo acima para buscar e adicionar produtos</p>
+        </div>
       )}
     </div>
   )
